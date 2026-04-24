@@ -11,3 +11,15 @@ import Foundation
 public protocol NetworkLoggerProtocol: Sendable {
     func log(_ message: String, level: LogLevel, file: String, function: String, line: Int)
 }
+
+public extension NetworkLoggerProtocol {
+    func log(
+        _ message: String,
+        level: LogLevel,
+        file: String = #file,
+        function: String = #function,
+        line: Int = #line
+    ) {
+        log(message, level: level, file: file, function: function, line: line)
+    }
+}
