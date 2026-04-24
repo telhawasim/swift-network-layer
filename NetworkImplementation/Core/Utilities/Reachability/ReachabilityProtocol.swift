@@ -6,3 +6,11 @@
 //
 
 import Foundation
+
+/// Protocol for Reachability
+public protocol ReachabilityProtocol: Sendable {
+    var currentStatus: NetworkStatus { get async }
+    
+    func startMonitoring() async
+    func stopMonitoring() async
+}
