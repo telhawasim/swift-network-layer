@@ -9,6 +9,10 @@ import SwiftUI
 
 @main
 struct NetworkImplementationApp: App {
+    
+    // MARK: - PROPERTIES -
+    
+    // MARK: - LIFECYCLE -
     var body: some Scene {
         WindowGroup {
             ContentView()
