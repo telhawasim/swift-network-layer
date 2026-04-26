@@ -1,0 +1,5 @@
+ENVIRONMENT = Development
+PRODUCT_BUNDLE_IDENTIFIER = app.com.network.development
+API_BASE_URL = https:/$()/api.dev.example.com
+ENABLE_LOGGING = YES
+APP_NAME = Network-Debug

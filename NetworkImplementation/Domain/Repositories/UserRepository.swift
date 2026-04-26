@@ -6,3 +6,10 @@
 //
 
 import Foundation
+
+/// User Repository Protocol
+protocol UserRepositoryProtocol {
+    func getUsers(limit: Int, skip: Int) async throws -> [User]
+    func getUser(id: Int) async throws -> User
+    func searchUsers(query: String) async throws -> [User]
+}

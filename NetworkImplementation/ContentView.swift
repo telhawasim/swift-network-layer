@@ -8,14 +8,22 @@
 import SwiftUI
 
 struct ContentView: View {
+    
+    // MARK: - PROPERTIES -
+    
+    /// State
+    @State private var loginViewModel = LoginViewModel()
+    @State private var productViewModel = ProductListViewModel()
+    
+    // MARK: - BODY -
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        NavigationView {
+            if loginViewModel.isLoading {
+                ProductListView(viewModel: $productViewModel)
+            } else {
+                LoginView(viewModel: $loginViewModel)
+            }
         }
-        .padding()
     }
 }
 

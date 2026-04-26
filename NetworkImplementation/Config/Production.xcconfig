@@ -1,0 +1,5 @@
+ENVIRONMENT = Production
+PRODUCT_BUNDLE_IDENTIFIER = app.com.network.production
+API_BASE_URL = https:/$()/api.example.com
+ENABLE_LOGGING = NO
+APP_NAME = Network-Prod

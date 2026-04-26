@@ -17,10 +17,10 @@ class DefaultRequest: RequestAdapterProtocol {
     // MARK: - PROPERTIES -
     
     /// Dependencies
-    private let tokenManager: TokenManager
+    private let tokenManager: TokenManagerProtocol
     
     // MARK: - INITIALIZER -
-    init(tokenManager: TokenManager) {
+    init(tokenManager: TokenManagerProtocol) {
         self.tokenManager = tokenManager
     }
     

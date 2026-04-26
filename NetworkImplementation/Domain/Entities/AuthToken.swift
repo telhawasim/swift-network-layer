@@ -6,3 +6,11 @@
 //
 
 import Foundation
+
+struct AuthToken {
+    let accessToken: String
+    let refreshToken: String
+    let expiresIn: TimeInterval
+    let userId: Int
+    let username: String
+}
