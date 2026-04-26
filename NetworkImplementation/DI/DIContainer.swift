@@ -47,15 +47,39 @@ final class DIContainer {
     }()
     
     lazy var networkClient: NetworkClientProtocol = {
-        NetworkClient(
+        let client = NetworkClient(
             session: sessionManager.getSession(),
             requestAdapter: requestAdapter,
             logger: networkLogger
         )
+        
+        /// Asynchronously inject interceptors to break the circular dependency loop
+        /// (AuthInterceptor -> RefreshTokenUseCase -> AuthRepository -> NetworkClient)
+        Task { [weak self] in
+            guard let self = self else { return }
+            let auth = self.authInterceptor
+            let retry = self.retryInterceptor
+            await client.setInterceptors(authInterceptor: auth, retryInterceptor: retry)
+        }
+        
+        return client
     }()
     
     lazy var networkService: NetworkServiceProtocol = {
         NetworkService(client: networkClient)
+    }()
+    
+    // MARK: - INTERCEPTORS -
+    
+    lazy var authInterceptor: AuthInterceptorProtocol = {
+        AuthInterceptor(
+            tokenManager: tokenManager,
+            refreshTokenUseCase: refreshTokenUseCase
+        )
+    }()
+    
+    lazy var retryInterceptor: RetryInterceptorProtocol = {
+        RetryInterceptor(maxRetryCount: 3)
     }()
     
     // MARK: - DATA SOURCES -

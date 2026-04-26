@@ -22,6 +22,9 @@ final actor NetworkClient {
     private let requestAdapter: RequestAdapterProtocol
     private let logger: NetworkLoggerProtocol
     
+    private var authInterceptor: AuthInterceptorProtocol?
+    private var retryInterceptor: RetryInterceptorProtocol?
+    
     // MARK: - INITIALIZER -
     init(
         session: URLSession = .shared,
@@ -32,43 +35,31 @@ final actor NetworkClient {
         self.requestAdapter = requestAdapter
         self.logger = logger
     }
+    
+    /// In order to safely inject interceptors to prevent DI loops
+    func setInterceptors(authInterceptor: AuthInterceptorProtocol?, retryInterceptor: RetryInterceptorProtocol?) {
+        self.authInterceptor = authInterceptor
+        self.retryInterceptor = retryInterceptor
+    }
 }
 
 // MARK: - NETWORK CLIENT PROTOCOL METHODS -
 extension NetworkClient: NetworkClientProtocol {
     
     func request<T: Decodable>(_ endpoint: Endpoint, responseType: T.Type) async throws -> T {
-        let request = try await buildRequest(from: endpoint)
-        
-        logger.logRequest(request)
-        
-        let (data, response) = try await performRequest(request)
-        
-        logger.logResponse(response, data: data)
-        
-        try validateResponse(response, data: data)
-        
-        do {
-            let decoder = JSONDecoder()
-            decoder.keyDecodingStrategy = .convertFromSnakeCase
-            let decodedData = try decoder.decode(T.self, from: data)
-            return decodedData
-        } catch {
-            logger.logError(NetworkError.decodingError(error))
-            throw NetworkError.decodingError(error)
+        return try await executeWithRetry(endpoint, attempt: 0, request: nil) { data in
+            do {
+                let decoder = JSONDecoder()
+                decoder.keyDecodingStrategy = .convertFromSnakeCase
+                return try decoder.decode(T.self, from: data)
+            } catch {
+                throw NetworkError.decodingError(error)
+            }
         }
     }
     
     func request(_ endpoint: any Endpoint) async throws {
-        let request = try await buildRequest(from: endpoint)
-        
-        logger.logRequest(request)
-        
-        let (data, response) = try await performRequest(request)
-        
-        logger.logResponse(response, data: data)
-        
-        try validateResponse(response, data: data)
+        _ = try await executeWithRetry(endpoint, attempt: 0, request: nil) { _ in return () }
     }
 }
 
@@ -160,6 +151,63 @@ extension NetworkClient {
             throw NetworkError.serverError
         default:
             throw NetworkError.httpError(statusCode: httpResponse.statusCode, data: data)
+        }
+    }
+    
+    /// In order to perform the request loop with retry logic
+    /// - Parameters:
+    ///   - endpoint: `Endpoint` configuration
+    ///   - attempt: `Int` current attempt
+    ///   - request: `URLRequest?` optional pre-built request
+    ///   - responseMapper: closure to map data to expected type
+    private func executeWithRetry<T>(
+        _ endpoint: Endpoint,
+        attempt: Int,
+        request: URLRequest?,
+        responseMapper: @escaping (Data) throws -> T
+    ) async throws -> T {
+        let urlRequest: URLRequest
+        if let request = request {
+            urlRequest = request
+        } else {
+            urlRequest = try await buildRequest(from: endpoint)
+        }
+        
+        if attempt == 0 {
+            logger.logRequest(urlRequest)
+        }
+        
+        do {
+            let (data, response) = try await performRequest(urlRequest)
+            
+            logger.logResponse(response, data: data)
+            try validateResponse(response, data: data)
+            
+            return try responseMapper(data)
+            
+        } catch let error as NetworkError {
+            logger.logError(error)
+            
+            /// 1. Handle Authentication Expiry (401)
+            if case .unauthorized = error, let authInterceptor = authInterceptor {
+                do {
+                    let retriedRequest = try await authInterceptor.retry(urlRequest, dueTo: error)
+                    return try await executeWithRetry(endpoint, attempt: attempt + 1, request: retriedRequest, responseMapper: responseMapper)
+                } catch {
+                    throw error
+                }
+            }
+            
+            /// 2. Handle Standard Network Retries
+            if let retryInterceptor = retryInterceptor, await retryInterceptor.shouldRetry(dueTo: error, attempt: attempt) {
+                return try await executeWithRetry(endpoint, attempt: attempt + 1, request: nil, responseMapper: responseMapper)
+            }
+            
+            throw error
+            
+        } catch {
+            logger.logError(error)
+            throw error
         }
     }
 }
