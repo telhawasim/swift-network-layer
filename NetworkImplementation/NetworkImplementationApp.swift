@@ -27,6 +27,9 @@ struct NetworkImplementationApp: App {
         /// Initialize DIContainer to setup all dependencies
         _ = DIContainer.shared
         
+        /// Start Network Monitoring
+        NetworkMonitor.shared.startMonitoring()
+        
         /// Any additional setup
         configureLogging()
     }

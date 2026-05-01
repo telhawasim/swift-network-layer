@@ -31,6 +31,14 @@ final class DIContainer {
         KeychainManager.shared
     }()
     
+    lazy var cacheManager: CacheManagerProtocol = {
+        CacheManager()
+    }()
+    
+    lazy var networkMonitor: NetworkMonitorProtocol = {
+        NetworkMonitor.shared
+    }()
+    
     lazy var tokenManager: TokenManagerProtocol = {
         TokenManager(keychainManager: keychainManager)
     }()
@@ -100,6 +108,14 @@ final class DIContainer {
         KeychainSecureStorage(keychainManager: keychainManager)
     }()
     
+    lazy var userLocalDataSource: UserLocalDataSourceProtocol = {
+        UserLocalDataSource(cacheManager: cacheManager)
+    }()
+    
+    lazy var productLocalDataSource: ProductLocalDataSourceProtocol = {
+        ProductLocalDataSource(cacheManager: cacheManager)
+    }()
+    
     // MARK: - REPOSITORIES -
     
     lazy var authRepository: AuthRepositoryProtocol = {
@@ -111,11 +127,19 @@ final class DIContainer {
     }()
     
     lazy var userRepository: UserRepositoryProtocol = {
-        UserRepositoryImpl(remoteDataSource: userRemoteDataSource)
+        UserRepositoryImpl(
+            remoteDataSource: userRemoteDataSource,
+            localDataSource: userLocalDataSource,
+            networkMonitor: networkMonitor
+        )
     }()
     
     lazy var productRepository: ProductRepositoryProtocol = {
-        ProductRepositoryImpl(remoteDataSource: productRemoteDataSource)
+        ProductRepositoryImpl(
+            remoteDataSource: productRemoteDataSource,
+            localDataSource: productLocalDataSource,
+            networkMonitor: networkMonitor
+        )
     }()
     
     // MARK: - USE CASES -

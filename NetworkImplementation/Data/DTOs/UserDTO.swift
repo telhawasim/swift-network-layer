@@ -70,7 +70,7 @@ struct CompanyDTO: Codable {
     let title: String
 }
 
-struct UsersResponseDTO: Decodable {
+struct UsersResponseDTO: Codable {
     let users: [UserDTO]
     let total: Int
     let skip: Int

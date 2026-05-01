@@ -21,14 +21,14 @@ struct ProductDTO: Codable {
     let images: [String]
 }
 
-struct ProductsResponseDTO: Decodable {
+struct ProductsResponseDTO: Codable {
     let products: [ProductDTO]
     let total: Int
     let skip: Int
     let limit: Int
 }
 
-struct ProductSearchResponseDTO: Decodable {
+struct ProductSearchResponseDTO: Codable {
     let products: [ProductDTO]
     let total: Int
     let skip: Int
