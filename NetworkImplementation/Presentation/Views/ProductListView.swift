@@ -1,33 +1,20 @@
-//
-//  ProductListView.swift
-//  NetworkImplementation
-//
-//  Created by Telha Wasim on 26/04/2026.
-//
-
 import SwiftUI
 
 struct ProductListView: View {
-    
-    // MARK: - PROPERTIES -
-    
-    /// Binding
-    @Binding var viewModel: ProductListViewModel
-    
-    // MARK: - BODY -
+    @Bindable var viewModel: ProductListViewModel
+    let onLogout: () async -> Void
+
     var body: some View {
         List {
-            ForEach(viewModel.products, id: \.id) { product in
+            ForEach(viewModel.products) { product in
                 ProductRow(product: product)
                     .onAppear {
                         if product.id == viewModel.products.last?.id {
-                            Task {
-                                await viewModel.loadProducts()
-                            }
+                            Task { await viewModel.loadProducts() }
                         }
                     }
             }
-            
+
             if viewModel.isLoading {
                 HStack {
                     Spacer()
@@ -35,64 +22,39 @@ struct ProductListView: View {
                     Spacer()
                 }
             }
-        }
-        .searchable(text: $viewModel.searchQuery)
-        .onChange(of: viewModel.searchQuery) { _, _ in
-            Task {
-                await viewModel.searchProducts()
+
+            if let error = viewModel.errorMessage {
+                Text(error).foregroundStyle(.red)
             }
         }
-        .refreshable {
-            await viewModel.refresh()
+        .searchable(text: $viewModel.searchQuery)
+        .task(id: viewModel.searchQuery) { await viewModel.search() }
+        .refreshable { await viewModel.refresh() }
+        .navigationTitle("Products")
+        .toolbar {
+            Button("Logout") { Task { await onLogout() } }
         }
-        .navigationTitle("Producsts")
-        .task {
-            await viewModel.loadProducts()
-        }
+        .task { await viewModel.loadProducts() }
     }
 }
 
-#Preview {
-    ProductListView(viewModel: Binding.constant(ProductListViewModel()))
-}
-
-struct ProductRow: View {
-    
-    // MARK: - PROPERTIES -
-    
-    /// Normal
+private struct ProductRow: View {
     let product: Product
-    
-    // MARK: - BODY -
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(product.title)
-                .font(.headline)
-            
+            Text(product.title).font(.headline)
             Text(product.description)
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .lineLimit(2)
-            
             HStack {
-                Text("$\(product.price, specifier: "%.2f")")
-                    .font(.title3)
-                    .fontWeight(.bold)
-                
-                if product.discountPercentage > 0 {
-                    Text("\(product.discountPercentage, specifier: "%.0f")% off")
-                        .font(.caption)
-                        .foregroundStyle(.red)
-                }
-                
+                Text(product.discountedPrice, format: .currency(code: "USD"))
+                    .font(.title3.bold())
                 Spacer()
-                
-                HStack(spacing: 2) {
-                    Image(systemName: "star.fill")
-                        .foregroundStyle(.yellow)
-                    Text("\(product.rating, specifier: "%.1f")")
-                }
-                .font(.caption)
+                Label(product.rating.formatted(.number.precision(.fractionLength(1))), systemImage: "star.fill")
+                    .font(.caption)
+                    .foregroundStyle(.yellow)
             }
         }
         .padding(.vertical, 4)

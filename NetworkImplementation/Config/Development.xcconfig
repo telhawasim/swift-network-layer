@@ -1,5 +1,10 @@
 ENVIRONMENT = Development
 PRODUCT_BUNDLE_IDENTIFIER = app.com.network.development
-API_BASE_URL = https:/$()/api.dev.example.com
+API_BASE_URL = https:/$()/dummyjson.com
 ENABLE_LOGGING = YES
+VERBOSE_LOGGING = YES
+ENABLE_SSL_PINNING = NO
+SSL_PINNED_DOMAIN = dummyjson.com
+SSL_PIN_SHA256_PRIMARY =
+SSL_PIN_SHA256_BACKUP =
 APP_NAME = Network-Debug

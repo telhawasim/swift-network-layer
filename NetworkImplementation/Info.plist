@@ -2,11 +2,31 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>API_BASE_URL</key>
-	<string>$(API_BASE_URL)</string>
-	<key>ENABLE_LOGGING</key>
-	<string>$(ENABLE_LOGGING)</string>
-	<key>ENVIRONMENT</key>
-	<string>$(ENVIRONMENT)</string>
+    <key>API_BASE_URL</key>
+    <string>$(API_BASE_URL)</string>
+
+    <key>API_TIMEOUT</key>
+    <integer>30</integer>
+
+    <key>MAX_RETRY_COUNT</key>
+    <integer>3</integer>
+
+    <key>ENABLE_LOGGING</key>
+    <string>$(ENABLE_LOGGING)</string>
+
+    <key>VERBOSE_LOGGING</key>
+    <string>$(VERBOSE_LOGGING)</string>
+
+    <key>ENABLE_SSL_PINNING</key>
+    <string>$(ENABLE_SSL_PINNING)</string>
+
+    <key>SSL_PINNED_DOMAIN</key>
+    <string>$(SSL_PINNED_DOMAIN)</string>
+
+    <key>SSL_CERTIFICATE_SHA256_PINS</key>
+    <array>
+        <string>$(SSL_PIN_SHA256_PRIMARY)</string>
+        <string>$(SSL_PIN_SHA256_BACKUP)</string>
+    </array>
 </dict>
 </plist>

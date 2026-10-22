@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum ConfigurationError: Error {
+enum ConfigurationError: Error, Sendable {
     case missingKey(String)
     case invalidValue(String)
     case invalidType(String)
@@ -21,4 +21,8 @@ enum ConfigurationError: Error {
         case .invalidPlistFormat: "Invalid Info.plist format"
         }
     }
+}
+
+extension ConfigurationError: LocalizedError {
+    var errorDescription: String? { localizedDescription }
 }

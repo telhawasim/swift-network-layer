@@ -1,98 +1,94 @@
-//
-//  ProductListViewModel.swift
-//  NetworkImplementation
-//
-//  Created by Telha Wasim on 26/04/2026.
-//
-
 import Foundation
+import Observation
 
 @MainActor
 @Observable
 final class ProductListViewModel {
-    
-    // MARK: - PROPERTIES -
-    
-    /// Observable Properties
-    var products: [Product] = []
-    var isLoading: Bool = false
-    var errorMessage: String? = nil
-    var searchQuery: String = ""
-    
-    /// Dependencies
-    private let getProductsUseCase: GetProductsUseCaseProtocol
-    private let searchProductsUseCase: SearchProductsUseCaseProtocol
-    private let logger: LoggerProtocol
-    
-    /// Normal
+    private(set) var products: [Product] = []
+    private(set) var isLoading = false
+    private(set) var errorMessage: String?
+    var searchQuery = ""
+
+    private let getProductsUseCase: any GetProductsUseCaseProtocol
+    private let searchProductsUseCase: any SearchProductsUseCaseProtocol
+    private let appSession: AppSession
+    private let logger: any AppLoggerProtocol
     private var currentPage = 0
     private let pageSize = 20
-    
-    // MARK: - INITIALIZER -
+    private var canLoadMore = true
+
     init(
-        getProductsUseCase: GetProductsUseCaseProtocol = DIContainer.shared.getProductsUseCase,
-        searchProductsUseCase: SearchProductsUseCaseProtocol = DIContainer.shared.searchProductsUseCase,
-        logger: LoggerProtocol = DIContainer.shared.logger
+        getProductsUseCase: any GetProductsUseCaseProtocol,
+        searchProductsUseCase: any SearchProductsUseCaseProtocol,
+        appSession: AppSession,
+        logger: any AppLoggerProtocol
     ) {
         self.getProductsUseCase = getProductsUseCase
         self.searchProductsUseCase = searchProductsUseCase
+        self.appSession = appSession
         self.logger = logger
     }
-    
-    /// In order to load products
+
     func loadProducts() async {
-        guard !isLoading else { return }
-        
+        guard !isLoading, canLoadMore, searchQuery.isEmpty else { return }
         isLoading = true
         errorMessage = nil
-        
+        defer { isLoading = false }
+
         do {
             let newProducts = try await getProductsUseCase.execute(
                 limit: pageSize,
                 skip: currentPage * pageSize
             )
-            
             products.append(contentsOf: newProducts)
             currentPage += 1
+            canLoadMore = newProducts.count == pageSize
             logger.info("Loaded \(newProducts.count) products")
-        } catch let error as NetworkError {
-            logger.error("Failed to load products: \(error.localizedDescription)")
-            errorMessage = error.localizedDescription
         } catch {
-            logger.error("Failed to load products: \(error.localizedDescription)")
-            errorMessage = "An unexpected error occured"
+            await handleAuthenticationFailure(error)
+            logger.error("Loading products failed")
+            errorMessage = error.localizedDescription
         }
-        
-        isLoading = false
     }
-    
-    /// In order to search products
-    func searchProducts() async {
-        guard !searchQuery.isEmpty else {
+
+    func search() async {
+        let query = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !query.isEmpty else {
+            await refresh()
             return
         }
-        
+
         isLoading = true
         errorMessage = nil
-        products = []
-        
+        defer { isLoading = false }
+
         do {
-            let searchResults = try await searchProductsUseCase.execute(query: searchQuery)
-            products = searchResults
-            logger.info("Found \(searchResults.count) products for query: \(searchQuery)")
-        } catch let error as NetworkError {
-            logger.error("Search failed: \(error.localizedDescription)")
-            errorMessage = error.localizedDescription
+            try await Task.sleep(for: .milliseconds(300))
+            try Task.checkCancellation()
+            products = try await searchProductsUseCase.execute(query: query)
+        } catch is CancellationError {
+            return
         } catch {
-            logger.error("Search failed: \(error.localizedDescription)")
-            errorMessage = "An unexpected error occured"
+            await handleAuthenticationFailure(error)
+            logger.error("Product search failed")
+            errorMessage = error.localizedDescription
         }
     }
-    
-    /// In order to refresh the states
+
     func refresh() async {
         currentPage = 0
+        canLoadMore = true
         products = []
-        await loadProducts()
+        if searchQuery.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            await loadProducts()
+        } else {
+            await search()
+        }
+    }
+
+    private func handleAuthenticationFailure(_ error: Error) async {
+        guard let networkError = error as? NetworkError,
+              case .authenticationRequired = networkError else { return }
+        await appSession.logout()
     }
 }

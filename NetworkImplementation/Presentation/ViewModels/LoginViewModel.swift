@@ -1,59 +1,42 @@
-//
-//  LoginViewModel.swift
-//  NetworkImplementation
-//
-//  Created by Telha Wasim on 26/04/2026.
-//
-
 import Foundation
+import Observation
 
 @MainActor
 @Observable
 final class LoginViewModel {
-    
-    // MARK: - PROPERTIES -
-    
-    /// Observable Properties
-    var username: String = ""
-    var password: String = ""
-    var isLoading: Bool = false
-    var errorMessage: String? = nil
-    var isLoggedIn: Bool = false
-    
-    /// Dependencies
-    private let loginUseCase: LoginUseCaseProtocol
-    private let logger: LoggerProtocol
-    
-    // MARK: - INITIALIZER -
+    var username = ""
+    var password = ""
+    private(set) var isLoading = false
+    private(set) var errorMessage: String?
+
+    private let loginUseCase: any LoginUseCaseProtocol
+    private let appSession: AppSession
+    private let logger: any AppLoggerProtocol
+
     init(
-        loginUseCase: LoginUseCaseProtocol = DIContainer.shared.loginUseCase,
-        logger: LoggerProtocol = DIContainer.shared.logger
+        loginUseCase: any LoginUseCaseProtocol,
+        appSession: AppSession,
+        logger: any AppLoggerProtocol
     ) {
         self.loginUseCase = loginUseCase
+        self.appSession = appSession
         self.logger = logger
     }
-    
-    /// In order to login
+
     func login() async {
+        guard !isLoading else { return }
         isLoading = true
         errorMessage = nil
-        
+        defer { isLoading = false }
+
         do {
-            let authToken = try await loginUseCase.execute(
-                username: username,
-                password: password
-            )
-            
-            logger.info("Login successful for user: \(authToken.username)")
-            isLoggedIn = true
-        } catch let error as NetworkError {
-            logger.error("Login failed: \(error.localizedDescription)")
-            errorMessage = error.localizedDescription
+            _ = try await loginUseCase.execute(username: username, password: password)
+            password = ""
+            appSession.didLogin()
+            logger.info("Login succeeded")
         } catch {
-            logger.error("Login failed: \(error.localizedDescription)")
-            errorMessage = "An unexpected error occured"
+            logger.error("Login failed")
+            errorMessage = error.localizedDescription
         }
-        
-        isLoading = false
     }
 }
