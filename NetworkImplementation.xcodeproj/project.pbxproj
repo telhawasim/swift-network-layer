@@ -6,10 +6,21 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXContainerItemProxy section */
+		C0D00000000000000000000C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 092B0C372F9AA71700040204 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 092B0C3E2F9AA71700040204;
+			remoteInfo = NetworkImplementation;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		092B0C3F2F9AA71700040204 /* NetworkImplementation.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NetworkImplementation.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		94395115854EB7F18C4CB389 /* Development.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Development.xcconfig; path = NetworkImplementation/Config/Development.xcconfig; sourceTree = "<group>"; };
 		A8EE6F4C869B061034A75D26 /* Production.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Production.xcconfig; path = NetworkImplementation/Config/Production.xcconfig; sourceTree = "<group>"; };
+		C0D000000000000000000001 /* NetworkImplementationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NetworkImplementationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -31,10 +42,22 @@
 			path = NetworkImplementation;
 			sourceTree = "<group>";
 		};
+		C0D000000000000000000002 /* NetworkImplementationTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = NetworkImplementationTests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		092B0C3C2F9AA71700040204 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C0D000000000000000000004 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -48,6 +71,7 @@
 			isa = PBXGroup;
 			children = (
 				092B0C412F9AA71700040204 /* NetworkImplementation */,
+				C0D000000000000000000002 /* NetworkImplementationTests */,
 				092B0C402F9AA71700040204 /* Products */,
 				90931CFB2C35D9786E336152 /* Config */,
 			);
@@ -57,6 +81,7 @@
 			isa = PBXGroup;
 			children = (
 				092B0C3F2F9AA71700040204 /* NetworkImplementation.app */,
+				C0D000000000000000000001 /* NetworkImplementationTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -93,6 +118,27 @@
 			productReference = 092B0C3F2F9AA71700040204 /* NetworkImplementation.app */;
 			productType = "com.apple.product-type.application";
 		};
+		C0D000000000000000000006 /* NetworkImplementationTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C0D000000000000000000007 /* Build configuration list for PBXNativeTarget "NetworkImplementationTests" */;
+			buildPhases = (
+				C0D000000000000000000003 /* Sources */,
+				C0D000000000000000000004 /* Frameworks */,
+				C0D000000000000000000005 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C0D00000000000000000000D /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				C0D000000000000000000002 /* NetworkImplementationTests */,
+			);
+			name = NetworkImplementationTests;
+			productName = NetworkImplementationTests;
+			productReference = C0D000000000000000000001 /* NetworkImplementationTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -105,6 +151,10 @@
 				TargetAttributes = {
 					092B0C3E2F9AA71700040204 = {
 						CreatedOnToolsVersion = 26.4.1;
+					};
+					C0D000000000000000000006 = {
+						CreatedOnToolsVersion = 26.4.1;
+						TestTargetID = 092B0C3E2F9AA71700040204;
 					};
 				};
 			};
@@ -123,12 +173,20 @@
 			projectRoot = "";
 			targets = (
 				092B0C3E2F9AA71700040204 /* NetworkImplementation */,
+				C0D000000000000000000006 /* NetworkImplementationTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		092B0C3D2F9AA71700040204 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C0D000000000000000000005 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -145,7 +203,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C0D000000000000000000003 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		C0D00000000000000000000D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 092B0C3E2F9AA71700040204 /* NetworkImplementation */;
+			targetProxy = C0D00000000000000000000C /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		7F5A3CB5A588984A1F3BDE61 /* Debug Development */ = {
@@ -552,6 +625,90 @@
 			};
 			name = "Debug Production";
 		};
+		C0D000000000000000000008 /* Debug Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = WQZ3XLJ7TJ;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.com.network.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/NetworkImplementation.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/NetworkImplementation";
+			};
+			name = "Debug Development";
+		};
+		C0D000000000000000000009 /* Release Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = WQZ3XLJ7TJ;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.com.network.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/NetworkImplementation.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/NetworkImplementation";
+			};
+			name = "Release Development";
+		};
+		C0D00000000000000000000A /* Debug Production */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = WQZ3XLJ7TJ;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.com.network.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/NetworkImplementation.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/NetworkImplementation";
+			};
+			name = "Debug Production";
+		};
+		C0D00000000000000000000B /* Release Production */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = WQZ3XLJ7TJ;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.com.network.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/NetworkImplementation.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/NetworkImplementation";
+			};
+			name = "Release Production";
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -573,6 +730,17 @@
 				C87B2BE5EFB8D2390956DFA3 /* Release Development */,
 				A3E88439A9B5E1A4C79FE312 /* Debug Production */,
 				9117516235C637E17BF09BF1 /* Release Production */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = "Debug Development";
+		};
+		C0D000000000000000000007 /* Build configuration list for PBXNativeTarget "NetworkImplementationTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C0D000000000000000000008 /* Debug Development */,
+				C0D000000000000000000009 /* Release Development */,
+				C0D00000000000000000000A /* Debug Production */,
+				C0D00000000000000000000B /* Release Production */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = "Debug Development";

@@ -1,6 +1,6 @@
 # Swift Network Layer (Swift 6)
 
-A native `URLSession` network layer organized with Clean Architecture and SOLID boundaries. It includes typed requests, single-flight token refresh, Keychain storage, redacted logging, certificate pinning, bounded retries, remote-first caching, multipart file transfers, resumable downloads, and UI-only reachability.
+A native `URLSession` network layer organized with Clean Architecture and SOLID boundaries. It includes typed requests, single-flight token refresh, in-flight request deduplication, Keychain storage, redacted logging, certificate pinning, bounded retries, remote-first caching, multipart file transfers, resumable downloads, and UI-only reachability.
 
 ## Architecture
 
@@ -35,6 +35,7 @@ NetworkImplementation/
 │   ├── Configuration/
 │   ├── Network/
 │   │   ├── Client/
+│   │   ├── Deduplication/
 │   │   ├── Download/
 │   │   ├── Logging/
 │   │   ├── Models/
@@ -64,6 +65,9 @@ NetworkImplementation/
 ├── Config/
 ├── ContentView.swift
 └── Info.plist
+
+NetworkImplementationTests/
+└── Core/Network/Deduplication/
 ```
 
 ## Implemented safeguards
@@ -77,6 +81,13 @@ NetworkImplementation/
 7. Endpoints return `APIRequest<Response>` and bodies are `Encodable`; the network boundary contains no `[String: Any]` request payloads.
 8. Retries are bounded, cancellation-aware, restricted by HTTP idempotency, use exponential backoff with jitter, and honor `Retry-After`.
 9. Multipart bodies are streamed to protected temporary files, support binary payloads without loading the full file into memory, validate header values, report progress, and clean up after foreground or background completion. Downloads persist protected resume data and validate their destination, size, MIME type, and SHA-256 digest before becoming visible.
+10. Concurrent identical `GET` and `HEAD` requests share one retry/authentication/network operation. Request fingerprints include the normalized URL, method, headers, and a body digest without retaining raw credentials. Each caller can cancel independently, and completed responses are not retained as a cache.
+
+## Request deduplication
+
+`APIRequest` uses `.automatic` deduplication by default. Only `GET` and `HEAD` requests participate; mutations always execute independently. Set `deduplicationPolicy: .disabled` on an exceptional read endpoint that must produce a separate network call for every caller.
+
+`InFlightRequestStore` shares the raw HTTP response before decoding. This lets two callers use different response types safely while ensuring retries and token refresh occur only once. An entry is removed immediately after success or failure, so this mechanism does not replace the disk cache.
 
 ## File transfers
 
@@ -101,4 +112,4 @@ Never enable pinning with guessed pins. Keep a backup pin so certificate rotatio
 
 ## Build
 
-Open `NetworkImplementation.xcodeproj`, select the Development or Production scheme, and build. The project requires iOS 18.6 and Swift 6.
+Open `NetworkImplementation.xcodeproj`, select the Development or Production scheme, and build. The project requires iOS 18.6 and Swift 6. The Development scheme includes the `NetworkImplementationTests` unit-test target.

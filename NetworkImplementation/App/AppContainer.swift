@@ -44,6 +44,8 @@ struct AppContainer {
             requestBuilder: refreshBuilder,
             authSession: nil,
             retryPolicy: retryPolicy,
+            fingerprintBuilder: SHA256RequestFingerprintBuilder(),
+            inFlightRequestStore: InFlightRequestStore(),
             logger: networkLogger
         )
         let authSession = AuthSession(
@@ -61,6 +63,8 @@ struct AppContainer {
             requestBuilder: requestBuilder,
             authSession: authSession,
             retryPolicy: retryPolicy,
+            fingerprintBuilder: SHA256RequestFingerprintBuilder(),
+            inFlightRequestStore: InFlightRequestStore(),
             logger: networkLogger
         )
         let cache = try DiskCacheStore()

@@ -42,6 +42,7 @@ struct APIRequest<Response: Decodable & Sendable>: Sendable {
     let body: Data?
     let authentication: AuthenticationRequirement
     let retryBehavior: RequestRetryBehavior
+    let deduplicationPolicy: RequestDeduplicationPolicy
 
     // MARK: - INITIALIZER -
     init(
@@ -50,7 +51,8 @@ struct APIRequest<Response: Decodable & Sendable>: Sendable {
         queryItems: [QueryItem] = [],
         headers: [String : String] = [:],
         authentication: AuthenticationRequirement = .bearerRequired,
-        retryBehavior: RequestRetryBehavior = .idempotentOnly
+        retryBehavior: RequestRetryBehavior = .idempotentOnly,
+        deduplicationPolicy: RequestDeduplicationPolicy = .automatic
     ) {
         self.pathComponents = pathComponents
         self.method = method
@@ -59,6 +61,7 @@ struct APIRequest<Response: Decodable & Sendable>: Sendable {
         self.body = nil
         self.authentication = authentication
         self.retryBehavior = retryBehavior
+        self.deduplicationPolicy = deduplicationPolicy
     }
 
     init<Body: Encodable>(
@@ -69,6 +72,7 @@ struct APIRequest<Response: Decodable & Sendable>: Sendable {
         body: Body,
         authentication: AuthenticationRequirement = .bearerRequired,
         retryBehavior: RequestRetryBehavior = .idempotentOnly,
+        deduplicationPolicy: RequestDeduplicationPolicy = .automatic,
         encoder: JSONEncoder = JSONEncoder()
     ) throws {
         self.pathComponents = pathComponents
@@ -78,5 +82,6 @@ struct APIRequest<Response: Decodable & Sendable>: Sendable {
         self.body = try encoder.encode(body)
         self.authentication = authentication
         self.retryBehavior = retryBehavior
+        self.deduplicationPolicy = deduplicationPolicy
     }
 }

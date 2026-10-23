@@ -10,6 +10,7 @@ import Foundation
 /// Enum for all HTTP Method
 enum HTTPMethod: String, Sendable {
     case get    = "GET"
+    case head   = "HEAD"
     case post   = "POST"
     case put    = "PUT"
     case patch  = "PATCH"
@@ -17,10 +18,20 @@ enum HTTPMethod: String, Sendable {
 
     var isIdempotent: Bool {
         switch self {
-        case .get, .put, .delete:
+        case .get, .head, .put, .delete:
             return true
 
         case .post, .patch:
+            return false
+        }
+    }
+
+    var supportsAutomaticDeduplication: Bool {
+        switch self {
+        case .get, .head:
+            return true
+
+        case .post, .put, .patch, .delete:
             return false
         }
     }
